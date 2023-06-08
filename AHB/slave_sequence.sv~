@@ -1,0 +1,16 @@
+class slave_sequence extends uvm_sequence#(sequence_item);  
+
+  `uvm_object_utils(slave_sequence)
+
+  function new (string name = "");
+    super.new(name);
+  endfunction
+
+  task body();
+	       repeat(1) begin
+		  	`uvm_do_with(req, {req.HWRITE == 1; req.HADDR == 'h38; req.HBURST == 3'b011; req.HTRANS == 0; req.HREADY == 1;})
+	       end
+  endtask
+
+endclass
+

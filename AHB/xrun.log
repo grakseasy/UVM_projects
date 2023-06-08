@@ -1,0 +1,24 @@
+xrun(64): 22.03-s002: (c) Copyright 1995-2022 Cadence Design Systems, Inc.
+TOOL:	xrun(64)	22.03-s002: Started on Jun 06, 2023 at 10:40:24 IDT
+xrun
+	-Q
+	-unbuffered
+	-timescale 1ns/1ns
+	-sysv
+	-access +rw
+	-uvmhome /tools/cdnc/xcelium/current/tools/methodology/UVM/CDNS-1.2/
+	fifo_pkg.sv
+	fifo_tb.sv
+	+UVM_TESTNAME=fifo_test
+	+define+COVERAGE_EN
+	-coverage all
+	-covoverwrite
+	+UVM_VERBOSITY=HIGH
+	-seed 11142341
+
+   User defined plus("+") options:
+	+UVM_VERBOSITY=HIGH
+
+xrun: *E,FILEMIS: Cannot find the provided file fifo_pkg.sv.
+xrun: *E,FILEMIS: Cannot find the provided file fifo_tb.sv.
+TOOL:	xrun(64)	22.03-s002: Exiting on Jun 06, 2023 at 10:40:25 IDT  (total: 00:00:01)

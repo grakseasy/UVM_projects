@@ -1,0 +1,14 @@
+IMC(64): 22.03-s001: (c) Copyright 1995-2022 Cadence Design Systems Inc - Simulator version: 22.03-s002 - Coverage engine version: 22.03-s002
+Starting gui mode
+imc: *I,RUNLD: Successfully loaded run /space/users/milosg/FIFO_verif/cov_work/scope/test_sv11142341.
+imc: *I,RUNLD: Successfully loaded run /space/users/milosg/FIFO_verif/cov_work/scope/test_sv11142341.
+imc: *I,RUNLD: Successfully loaded run /space/users/milosg/FIFO_verif/cov_work/scope/test_sv11142341.
+imc: *I,RUNLD: Successfully loaded run /space/users/milosg/FIFO_verif/cov_work/scope/test_sv11142341.
+imc: *I,RUNLD: Successfully loaded run /space/users/milosg/FIFO_verif/cov_work/scope/test_sv11142341.
+Adding recursive exclude to coverbin 'fifo_pkg/fifo_cg/wr_en_vs_rd_en/"auto[1],auto[1]"'
+Adding recursive exclude to coverbin 'fifo_pkg/fifo_cg/full_vs_empty/"auto[1],auto[1]"'
+Adding recursive exclude to coverbin 'fifo_pkg/fifo_cg/write_enable_vs_full/"auto[1],auto[1]"'
+imc: *I,RUNLD: Successfully loaded run /space/users/milosg/FIFO_verif/cov_work/scope/test_sv11142341.
+imc: *I,RUNLD: Successfully loaded run /space/users/milosg/FIFO_verif/cov_work/scope/test_sv11142341.
+imc: *I,RUNLD: Successfully loaded run /space/users/milosg/FIFO_verif/cov_work/scope/test_sv11142341.
+imc: *I,RUNLD: Successfully loaded run /space/users/milosg/FIFO_verif/cov_work/scope/test_sv11142341.

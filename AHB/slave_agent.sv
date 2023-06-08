@@ -1,0 +1,35 @@
+class slave_agent extends uvm_agent;
+  
+  `uvm_component_utils(slave_agent)
+  
+  slave_monitor s_monitor;
+  slave_driver s_driver;
+  uvm_sequencer#(sequence_item) s_sequencer;
+
+  
+  function new(string name, uvm_component parent);
+    super.new(name,parent);
+  endfunction
+  
+  function void build_phase(uvm_phase phase);
+    super.build_phase(phase);
+    if(get_is_active == UVM_ACTIVE)
+      begin
+        s_driver = slave_driver::type_id::create("s_driver",this);
+        s_sequencer = uvm_sequencer#(sequence_item)::type_id::create("s_sequencer",this);
+      end
+        s_monitor = slave_monitor::type_id::create("s_monitor",this);
+  endfunction
+  
+  function void connect_phase(uvm_phase phase);
+    super.connect_phase(phase);
+    if(get_is_active == UVM_ACTIVE) 
+	    begin
+	      `uvm_info("slave_agent", $sformatf("SLAVE AGENT connect phase"), UVM_HIGH)
+	       s_driver.seq_item_port.connect(s_sequencer.seq_item_export);
+	    end
+endfunction
+  
+endclass
+    
+    

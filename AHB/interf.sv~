@@ -1,0 +1,10 @@
+interface interf(input logic HCLK);
+  bit HWRITE;
+  bit[31:0] HADDR;
+  bit[2:0] HBURST;
+  bit[2:0] HSIZE;
+  bit HREADY; 
+  bit[1:0] HTRANS; 
+  bit[31:0] HRDATA;
+  bit[31:0] HWDATA;
+endinterface

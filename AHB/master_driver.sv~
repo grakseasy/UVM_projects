@@ -1,0 +1,173 @@
+class master_driver extends uvm_driver #(sequence_item);
+
+  //Virtual Interface
+  virtual interf vintf;
+  rand int size; 
+
+  `uvm_component_utils(master_driver)
+   
+  //uvm_analysis_port #(mem_seq_item) Drvr2Sb_port;
+
+  // Constructor 
+  function new (string name, uvm_component parent);
+    super.new(name, parent);
+  endfunction : new
+
+  function void build_phase(uvm_phase phase);
+    super.build_phase(phase);
+     if(!uvm_config_db#(virtual interf)::get(this, "", "vintf", vintf))
+       `uvm_fatal("NO_VIF",{"virtual interface must be set for: ",get_full_name(),".vintf"});
+  endfunction: build_phase
+
+  // Run phase
+  virtual task run_phase(uvm_phase phase);
+    @(posedge vintf.HCLK)
+		forever begin  
+		  seq_item_port.get_next_item(req);
+		  if(req.HWRITE == 0)
+				vintf.HWRITE = req.HWRITE;
+				begin
+					if(req.HTRANS == 1) //SEQ 
+						begin	
+							`uvm_error("MASTER DRIVER", "The first transfer cannot be SEQ!")
+						end
+					else if(req.HTRANS == 0) //NONSEQ
+						begin
+							if(req.HBURST == 3'b000) // SINGLE
+								begin
+									single_burst();
+								end
+							else if(req.HBURST == 3'b001 || req.HBURST == 3'b011 || req.HBURST == 3'b101 || req.HBURST == 3'b111) // INCR, INCR4, INCR8, INCR16
+								begin
+									increment_burst(req.HBURST);
+								end
+							else if(req.HBURST == 3'b010 || req.HBURST == 3'b100) // WRAP4, WRAP8, WRAP16
+								begin
+  									wrap_burst(req.HBURST);
+								end
+						end
+				end
+		@(posedge vintf.HCLK)
+		seq_item_port.item_done();
+		end
+  endtask
+
+
+  task single_burst();
+        vintf.HTRANS = req.HTRANS;
+		vintf.HADDR  = req.HADDR;
+		vintf.HWDATA = req.HWDATA;
+		vintf.HSIZE  = req.HSIZE;
+		`uvm_info("MASTER DRIVER", $sformatf("Driver: HADDR = 0x%0h", vintf.HADDR), UVM_HIGH)
+		`uvm_info("MASTER DRIVER", $sformatf("Driver: HWDATA = 0x%0h (HSIZE: %b)", vintf.HWDATA, vintf.HSIZE), UVM_HIGH)
+  endtask
+
+  //INCREMENT
+  task increment_burst(bit[7:0] incr_type);
+	int num;
+	if(incr_type == 3'b001) //INCR Undefined
+		begin
+			num = $urandom_range(1,9);
+		end
+	if(incr_type == 3'b011) //INCR4
+		begin
+			num = 4;
+		end
+	if(incr_type == 3'b101) //INCR8
+		begin
+			num = 8;
+		end
+	if(incr_type == 3'b111) //INCR16
+		begin
+			num = 16;
+		end
+	for(int i = 0; i < num; i++)
+	@(posedge vintf.HCLK)
+		begin
+			vintf.HBURST = req.HBURST;
+			vintf.HADDR = req.HADDR;
+			vintf.HWDATA = req.HADDR;
+			vintf.HSIZE = req.HSIZE;
+			req.HADDR = req.HADDR + 4; //4 because i'm always working with WORD
+			if(i == 0)
+				begin
+					vintf.HTRANS = req.HTRANS; //First one is NONSEQ 
+				end
+			else
+				begin
+					vintf.HTRANS = !req.HTRANS; //The rest are SEQ 
+				end
+			`uvm_info("MASTER DRIVER", $sformatf("Driver: HADDR = 0x%0h", vintf.HADDR), UVM_HIGH)
+			`uvm_info("MASTER DRIVER", $sformatf("Driver: HWDATA = 0x%0h", vintf.HWDATA), UVM_HIGH)
+		end
+  endtask : increment_burst
+  
+  function int findRange(int addrBound, bit [31:0] startAddr);
+	int lowerRange;
+    for(int i = 0; i<startAddr; i = i+addrBound)
+		begin
+			lowerRange = i;
+		end
+	return lowerRange;
+  endfunction : findRange  
+
+
+  //WRAP
+  task wrap_burst(bit[7:0] wrap_type);
+  	int num;
+    int addr_boundary;
+    int upperRange;
+    int lowerRange;
+    int size;
+	if(wrap_type == 3'b010) //WRAP4
+		begin
+			num = 4;
+            if(req.HSIZE == 2'b10)
+            	size = 4;
+            addr_boundary = 4 * size;
+		end
+	if(wrap_type == 3'b100) //WRAP8
+		begin
+			num = 8;
+            if(req.HSIZE == 2'b10)
+            	size = 4;
+            addr_boundary = num * size;
+		end
+	if(wrap_type == 3'b110) //WRAP16
+		begin
+			num = 16;
+            if(req.HSIZE == 2'b10)
+            	size = 4;
+            addr_boundary = num * size;
+		end 
+    lowerRange = findRange(addr_boundary, req.HADDR);
+    upperRange = lowerRange + addr_boundary;
+	for(int i = 0; i < num; i++)
+	@(posedge vintf.HCLK)
+		begin
+			vintf.HBURST = req.HBURST;
+			vintf.HADDR = req.HADDR;
+			vintf.HWDATA = req.HADDR;
+			vintf.HSIZE = req.HSIZE;
+			req.HADDR = req.HADDR + size;  
+			if(req.HADDR >= upperRange)
+				begin
+					req.HADDR = lowerRange;
+				end
+			if(i == 0)
+				begin
+					vintf.HTRANS = req.HTRANS; //First one is NONSEQ 
+				end
+			else
+				begin
+					vintf.HTRANS = !req.HTRANS; //The rest are SEQ 
+				end
+			`uvm_info("MASTER DRIVER", $sformatf("Driver: HADDR = 0x%0h", vintf.HADDR), UVM_HIGH)
+			`uvm_info("MASTER DRIVER", $sformatf("Driver: HWDATA = 0x%0h", vintf.HWDATA), UVM_HIGH)
+		end
+  endtask : wrap_burst
+
+endclass : master_driver 
+
+
+

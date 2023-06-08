@@ -1,0 +1,114 @@
+
+class slave_driver extends uvm_driver#(sequence_item);
+
+  virtual interf vintf;
+  `uvm_component_utils(slave_driver)
+  
+  function new(string name = "slave_driver", uvm_component parent = null);
+    super.new(name, parent);
+  endfunction
+  
+  function void build_phase(uvm_phase phase);
+    super.build_phase(phase);
+     if(!uvm_config_db#(virtual interf)::get(this, "", "vintf", vintf))
+       `uvm_fatal("NO_VIF",{"virtual interface must be set for: ",get_full_name(),".vintf"});
+  endfunction: build_phase
+
+  virtual task run_phase(uvm_phase phase);
+    @(posedge vintf.HCLK)
+		forever begin  
+		  seq_item_port.get_next_item(req);
+		  if(req.HWRITE == 1)
+				vintf.HWRITE = 1;
+				vintf.HTRANS = 0;
+				vintf.HADDR  = 0;
+				vintf.HRDATA = 0;
+				vintf.HSIZE  = 0;
+				vintf.HWDATA = 0;
+				begin
+					if(req.HTRANS == 1) //SEQ 
+						begin	
+							`uvm_error("SLAVE DRIVER", "The first transfer cannot be SEQ!")
+						end
+					else if(req.HTRANS == 0) //NONSEQ
+						begin
+							if(req.HBURST == 3'b000) // SINGLE
+								begin
+									single_burst();
+								end
+							else if(req.HBURST == 3'b001 || req.HBURST == 3'b011 || req.HBURST == 3'b101 || req.HBURST == 3'b111) // INCR, INCR4, INCR8, INCR16
+								begin
+									increment_burst(req.HBURST);
+								end
+							else if(req.HBURST == 3'b010) // WRAP4
+								begin
+									//...
+								end
+						end
+				end
+		@(posedge vintf.HCLK)
+		seq_item_port.item_done();
+		end
+  endtask
+
+
+  task single_burst();
+		if(vintf.HREADY == 0)
+			begin
+				@(posedge vintf.HCLK);
+			end		
+        vintf.HTRANS = req.HTRANS;
+		vintf.HADDR  = req.HADDR;
+		vintf.HRDATA = req.HRDATA;
+		vintf.HSIZE  = req.HSIZE;
+		`uvm_info("SLAVE DRIVER", $sformatf("Driver: HADDR = 0x%0h", vintf.HADDR), UVM_HIGH)
+		`uvm_info("SLAVE DRIVER", $sformatf("Driver: HRDATA = 0x%0h (HSIZE: %b)", vintf.HRDATA, vintf.HSIZE), UVM_HIGH)
+  endtask
+
+
+  task increment_burst(bit[7:0] incr_type);
+	int num;
+	if(incr_type == 3'b001) //INCR Undefined
+		begin
+			num = $urandom_range(1,9);
+		end
+	if(incr_type == 3'b011) //INCR4
+		begin
+			num = 4;
+		end
+	if(incr_type == 3'b101) //INCR8
+		begin
+			num = 8;
+		end
+	if(incr_type == 3'b111) //INCR16
+		begin
+			num = 16;
+		end
+	for(int i = 0; i < num; i++)
+	@(posedge vintf.HCLK)
+		begin
+			if(vintf.HREADY == 0)
+				begin
+					@(posedge vintf.HCLK);
+				end			
+				vintf.HBURST = req.HBURST;
+				vintf.HADDR = req.HADDR;
+				vintf.HRDATA = req.HADDR;
+				vintf.HSIZE = req.HSIZE;
+				req.HADDR = req.HADDR + num;
+				if(i == 0)
+					begin
+						vintf.HTRANS = req.HTRANS;  //First transfer is NONSEQ 
+					end
+				else
+					begin
+						vintf.HTRANS = !req.HTRANS; //Next transfers are SEQ 
+					end
+			    `uvm_info("SLAVE DRIVER", $sformatf("Driver: HADDR = 0x%0h", vintf.HADDR), UVM_HIGH)                                                                                                                                               
+				`uvm_info("SLAVE DRIVER", $sformatf("Driver: HRDATA = 0x%0h", vintf.HRDATA), UVM_HIGH)   
+
+				                                                                                        
+		end
+  endtask : increment_burst
+
+endclass

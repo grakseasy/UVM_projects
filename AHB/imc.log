@@ -1,0 +1,16 @@
+IMC(64): 22.03-s001: (c) Copyright 1995-2022 Cadence Design Systems Inc - Simulator version: 22.03-s002 - Coverage engine version: 22.03-s002
+Starting gui mode
+imc: *I,RUNLD: Successfully loaded run /space/users/milosg/AHB/cov_work/scope/test.
+imc: *I,RUNLD: Successfully loaded run /space/users/milosg/AHB/cov_work/scope/test.
+imc: *I,RUNLD: Successfully loaded run /space/users/milosg/AHB/cov_work/scope/test_sv114324.
+imc: *I,RUNLD: Successfully loaded run /space/users/milosg/AHB/cov_work/scope/test_sv114324.
+imc: *I,RUNLD: Successfully loaded run /space/users/milosg/AHB/cov_work/scope/test_sv114324.
+imc: *I,RUNLD: Successfully loaded run /space/users/milosg/AHB/cov_work/scope/test_sv114324.
+imc: *I,RUNLD: Successfully loaded run /space/users/milosg/AHB/cov_work/scope/test_sv114324.
+imc: *I,RUNLD: Successfully loaded run /space/users/milosg/AHB/cov_work/scope/test_sv11123.
+imc: *I,RUNLD: Successfully loaded run /space/users/milosg/AHB/cov_work/scope/test_sv11123.
+imc: *I,RUNLD: Successfully loaded run /space/users/milosg/AHB/cov_work/scope/test_sv11123.
+imc: *I,RUNLD: Successfully loaded run /space/users/milosg/AHB/cov_work/scope/test_sv11123.
+imc: *I,RUNLD: Successfully loaded run /space/users/milosg/AHB/cov_work/scope/test_sv111888.
+imc: *I,RUNLD: Successfully loaded run /space/users/milosg/AHB/cov_work/scope/test_sv111888.
+imc: *I,RUNLD: Successfully loaded run /space/users/milosg/AHB/cov_work/scope/test_sv111888.

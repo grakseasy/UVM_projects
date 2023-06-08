@@ -1,0 +1,1 @@
+s1(25May2023:10:12:09):  xrun -Q -unbuffered -timescale 1ns/1ns -sysv -access +rw -uvmhome /tools/cdnc/xcelium/current/tools/methodology/UVM/CDNS-1.2/ pkg.sv testbench.sv +UVM_TESTNAME=test +define+COVERAGE_EN -coverage all -covoverwrite +UVM_VERBOSITY=HIGH -seed 127123412 

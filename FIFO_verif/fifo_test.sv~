@@ -1,0 +1,31 @@
+class fifo_test extends uvm_test;
+  
+  `uvm_component_utils(fifo_test)
+   fifo_env env;
+// SEQUENCERRRRRRRRRRRRRRRRRRRRRRRRRRRRR
+    
+  function new(string name = "fifo_test", uvm_component parent = null);
+    super.new(name,parent);
+  endfunction
+
+  function void build_phase(uvm_phase phase);
+    super.build_phase(phase);
+    env = fifo_env::type_id::create("env", this);
+  endfunction
+
+  task run_phase(uvm_phase phase);
+  	phase.raise_objection(this);
+	begin
+		fifo_master_sequence seq;
+		fifo_slave_sequence s_seq;
+		seq = fifo_master_sequence::type_id::create("seq", this);
+	        s_seq = fifo_slave_sequence::type_id::create("s_seq", this);
+		seq.randomize();// with {wr_trans == 3; rd_trans == 3;};
+		seq.start(env.m_agent.sequencer);
+		s_seq.start(env.s_agent.sequencer);
+		`uvm_info("TEST", $sformatf("test started"), UVM_LOW)
+	end
+	phase.drop_objection(this);
+  endtask
+endclass
+  

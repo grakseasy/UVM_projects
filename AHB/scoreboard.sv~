@@ -1,0 +1,36 @@
+`uvm_analysis_imp_decl(_master)
+`uvm_analysis_imp_decl(_slave)
+
+class scoreboard extends uvm_scoreboard;
+
+  `uvm_component_utils(scoreboard)
+
+  uvm_analysis_imp_master #(sequence_item, scoreboard) items_master;
+  uvm_analysis_imp_slave #(sequence_item, scoreboard) items_slave;
+
+  sequence_item master_q[$];
+  sequence_item slave_q[$];
+
+  function new (string name, uvm_component parent);
+    super.new(name, parent);
+  endfunction : new
+
+  function void build_phase(uvm_phase phase);
+    super.build_phase(phase);
+    items_master = new("items_master", this);
+    items_slave = new("items_slave", this);
+  endfunction: build_phase
+  
+  // write
+  virtual function void write_master(sequence_item transaction);
+    master_q.push_back(transaction); 
+    `uvm_info("SCOREBOARD", $sformatf("Item written: 0x%0h", transaction.HWDATA), UVM_HIGH)
+  endfunction : write_master
+
+  virtual function void write_slave(sequence_item transaction);
+    slave_q.push_back(transaction); 
+    `uvm_info("SCOREBOARD", $sformatf("Item read: 0x%0h", transaction.HRDATA), UVM_HIGH)
+  endfunction : write_slave
+
+endclass : scoreboard
+

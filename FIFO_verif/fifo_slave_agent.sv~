@@ -1,0 +1,33 @@
+class fifo_slave_agent extends uvm_agent;
+  
+  `uvm_component_utils(fifo_slave_agent)
+  
+  slave_monitor s_monitor;
+  fifo_slave_driver s_driver;
+  uvm_sequencer#(fifo_transaction) sequencer;
+  
+  function new(string name, uvm_component parent);
+    super.new(name,parent);
+  endfunction
+  
+  function void build_phase(uvm_phase phase);
+    super.build_phase(phase);
+    if(get_is_active == UVM_ACTIVE)
+      begin
+        s_driver = fifo_slave_driver::type_id::create("s_driver", this);        
+        sequencer = uvm_sequencer#(fifo_transaction)::type_id::create("sequencer",this);
+      end
+        s_monitor = slave_monitor::type_id::create("s_monitor", this);
+  endfunction
+  
+  function void connect_phase(uvm_phase phase);
+    super.connect_phase(phase);
+    if(get_is_active == UVM_ACTIVE) 
+	    begin
+	      `uvm_info("fifo_slave_agent", $sformatf("AGENT connect phase"), UVM_HIGH)  
+	       s_driver.seq_item_port.connect(sequencer.seq_item_export);
+	    end
+  endfunction
+endclass
+    
+    

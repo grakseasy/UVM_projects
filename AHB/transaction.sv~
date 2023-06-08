@@ -1,0 +1,51 @@
+typedef enum bit [1:0] {
+  BYTE        = 2'b00, //  8 bits
+  HALFWORD    = 2'b01, // 16 bits
+  WORD        = 2'b10  // 32 bits
+} ahb_hsize;
+
+
+typedef enum bit [2:0] {
+  SINGLE      = 3'b000,
+  INCR        = 3'b001,
+  INCR4       = 3'b011,
+  INCR8       = 3'b101,
+  INCR16      = 3'b111,
+  WRAP4       = 3'b010,
+  WRAP8       = 3'b100,
+  WRAP16      = 3'b110
+  } ahb_hburst;
+
+
+class sequence_item extends uvm_sequence_item;
+
+  `uvm_object_utils(sequence_item)
+
+  rand bit [31:0] HADDR;
+  rand ahb_hsize HSIZE;   
+  rand ahb_hburst HBURST;
+  rand enum {NONSEQ, SEQ} HTRANS;
+  rand bit[31:0] HWDATA;  
+  rand bit[31:0] HRDATA;  
+  bit HREADY;
+  rand bit HWRITE;
+
+  function new(string name = "sequence_item");
+    super.new(name);
+  endfunction
+  
+  constraint hsize_constraint {
+    HSIZE inside {BYTE, HALFWORD, WORD};
+  }
+
+  constraint hburst_constraint {
+    HBURST inside {SINGLE, INCR, INCR4, INCR8, INCR16, WRAP4, WRAP8, WRAP16};
+  }
+
+  constraint c_data_bus_width {
+	HSIZE == BYTE -> $bits(HWDATA) <= 8;
+	HSIZE == HALFWORD -> $bits(HWDATA) <= 16;
+	HSIZE == WORD -> $bits(HWDATA) <= 32;
+  }
+   
+endclass

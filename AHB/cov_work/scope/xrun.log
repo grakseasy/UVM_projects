@@ -1,0 +1,24 @@
+xrun(64): 22.03-s002: (c) Copyright 1995-2022 Cadence Design Systems, Inc.
+TOOL:	xrun(64)	22.03-s002: Started on May 25, 2023 at 10:12:09 IDT
+xrun
+	-Q
+	-unbuffered
+	-timescale 1ns/1ns
+	-sysv
+	-access +rw
+	-uvmhome /tools/cdnc/xcelium/current/tools/methodology/UVM/CDNS-1.2/
+	pkg.sv
+	testbench.sv
+	+UVM_TESTNAME=test
+	+define+COVERAGE_EN
+	-coverage all
+	-covoverwrite
+	+UVM_VERBOSITY=HIGH
+	-seed 127123412
+
+   User defined plus("+") options:
+	+UVM_VERBOSITY=HIGH
+
+xrun: *E,FILEMIS: Cannot find the provided file pkg.sv.
+xrun: *E,FILEMIS: Cannot find the provided file testbench.sv.
+TOOL:	xrun(64)	22.03-s002: Exiting on May 25, 2023 at 10:12:09 IDT  (total: 00:00:00)
