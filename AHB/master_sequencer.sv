@@ -1,4 +1,4 @@
-class m_sequencer extends uvm_sequencer#(sequence_item);
+class m_sequencer extends uvm_sequencer;
 
    `uvm_sequencer_utils(m_sequencer)
      
